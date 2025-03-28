@@ -15,6 +15,7 @@ import {
   Brightness7 as Brightness7Icon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import Footer from '../Footer/Footer';
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ function LandingPage() {
                 color: darkMode ? "#f8fafc" : "#0f172a",
               }}
             >
-              Code<span style={{ color: "#dc2626", fontWeight: 800 }}>Cracker</span>
+              Code<span style={{ color: "#dc2626", fontWeight: 800 }}>Tracker</span>
             </Typography>
             <IconButton
               onClick={() => setDarkMode(!darkMode)}
@@ -193,7 +194,7 @@ function LandingPage() {
                           textAlign: "center",
                         }}
                       >
-                        Monitor your progress across LeetCode, GeeksForGeeks, CodeForces, and CodeChef in one interactive dashboard. 
+                        Monitor your progress across LeetCode, GeeksForGeeks, HackerRank, CodeForces, and CodeChef in one interactive dashboard. 
                         Get insights into your strengths, weaknesses, and growth over time.
                       </Typography>
                     </motion.div>
@@ -372,8 +373,8 @@ function LandingPage() {
                 color: "#dc2626",
               },
               {
-                title: "Improve",
-                description: "Get personalized recommendations to boost your skills",
+                title: "In One Click",
+                description: "Access all the information you need instantly with just one click!",
                 number: 3,
                 color: "#dc2626",
               },
@@ -526,6 +527,7 @@ function LandingPage() {
           </Grid>
         </Container>
       </Box>
+      <Footer darkMode={darkMode} />
     </Box>
   );
 }

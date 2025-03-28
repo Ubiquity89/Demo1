@@ -10,12 +10,16 @@ import {
   Tab,
   CircularProgress,
   Alert,
-  CardContent
+  CardContent,
+  IconButton
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import { Brightness4, Brightness7 } from '@mui/icons-material';
+import Footer from '../Footer/Footer';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -60,9 +64,11 @@ interface PlatformData {
 }
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [selectedPlatform, setSelectedPlatform] = useState<string>("leetcode");
   const [platforms, setPlatforms] = useState<PlatformData[]>([]);
   const [error, setError] = useState<string>("");
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
     const savedData = localStorage.getItem('codingProfile');
@@ -384,31 +390,93 @@ function Dashboard() {
 
   const selectedPlatformData = platforms.find(p => p.name === selectedPlatform);
 
-  // ... rest of the code ...
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
+  const handleDarkModeToggle = () => {
+    setDarkMode(prev => !prev);
+  };
 
   return (
-    <Container maxWidth="lg">
-      <Paper sx={{ p: 4, mt: 8, borderRadius: 2, backdropFilter: 'blur(6px)', backgroundColor: 'rgba(30, 41, 59, 0.85)' }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>Your Coding Progress</Typography>
-          <Tabs value={selectedPlatform} onChange={handleTabChange} sx={{ mb: 4 }}>
-            {platforms.map(platform => (
-              <Tab key={platform.name} value={platform.name} label={platform.name.charAt(0).toUpperCase() + platform.name.slice(1)} />
-            ))}
-          </Tabs>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          {selectedPlatformData && (
-            <Box>
-              {selectedPlatformData.loading && <CircularProgress />}
-              {selectedPlatformData.error && <Alert severity="error" sx={{ mb: 2 }}>{selectedPlatformData.error}</Alert>}
-              {getPlatformStats(selectedPlatformData)}
-            </Box>
-          )}
-        </motion.div>
-      </Paper>
-    </Container>
+    <Box sx={{ minHeight: '100vh', bgcolor: darkMode ? '#000000' : '#ffffff' }}>
+      {/* Header */}
+      <Box
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          backdropFilter: "blur(10px)",
+          bgcolor: darkMode ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.95)",
+          borderBottom: `1px solid ${darkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"}`,
+        }}
+      >
+        <Container maxWidth="lg" sx={{ py: 2 }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              sx={{
+                color: darkMode ? "#f8fafc" : "#0f172a",
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8,
+                },
+              }}
+              onClick={handleLogoClick}
+            >
+              Code<span style={{ color: "#dc2626", fontWeight: 800 }}>Tracker</span>
+            </Typography>
+            <IconButton
+              onClick={handleDarkModeToggle}
+              sx={{ color: darkMode ? "#f8fafc" : "#0f172a" }}
+            >
+              {darkMode ? <Brightness7 /> : <Brightness4 />}
+            </IconButton>
+          </Box>
+        </Container>
+      </Box>
+
+      <Container maxWidth="md" sx={{ 
+        mt: 12,
+        bgcolor: darkMode ? '#000000' : '#ffffff',
+        pt: 4,
+        pb: 4
+      }}>
+        <Paper
+          sx={{
+            p: 4,
+            borderRadius: 2,
+            backdropFilter: 'blur(6px)',
+            backgroundColor: 'rgba(30, 41, 59, 0.85)',
+          }}
+        >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>Your Coding Progress</Typography>
+            <Tabs value={selectedPlatform} onChange={handleTabChange} sx={{ mb: 4 }}>
+              {platforms.map(platform => (
+                <Tab key={platform.name} value={platform.name} label={platform.name.charAt(0).toUpperCase() + platform.name.slice(1)} />
+              ))}
+            </Tabs>
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            {selectedPlatformData && (
+              <Box>
+                {selectedPlatformData.loading && <CircularProgress />}
+                {selectedPlatformData.error && <Alert severity="error" sx={{ mb: 2 }}>{selectedPlatformData.error}</Alert>}
+                {getPlatformStats(selectedPlatformData)}
+              </Box>
+            )}
+          </motion.div>
+        </Paper>
+      </Container>
+
+      {selectedPlatformData && !selectedPlatformData.loading && (
+        <Footer darkMode={darkMode} />
+      )}
+    </Box>
   );
 }
-
 
 export default Dashboard;
