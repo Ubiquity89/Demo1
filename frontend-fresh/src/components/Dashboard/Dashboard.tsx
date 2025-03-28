@@ -10,6 +10,7 @@ import {
   Tab,
   CircularProgress,
   Alert,
+  CardContent
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -147,26 +148,25 @@ function Dashboard() {
   const getPlatformStats = (platform: PlatformData) => {
     if (!platform.stats) return null;
 
-    const { total_solved, easy_solved, medium_solved, hard_solved, profile_url } = platform.stats;
+    const { total_solved, easy_solved, medium_solved, hard_solved, profile_url, school_solved, basic_solved } = platform.stats;
 
+    // Create pie chart data for LeetCode and GFG
     let pieChart = null;
     if (platform.name === "leetcode" || platform.name === "gfg") {
       const data = {
-        labels: ['Easy', 'Medium', 'Hard'],
+        labels: platform.name === "leetcode" ? ['Easy', 'Medium', 'Hard'] : ['School', 'Basic', 'Easy', 'Medium', 'Hard'],
         datasets: [
           {
-            data: [easy_solved, medium_solved, hard_solved],
+            data: platform.name === "leetcode" ? [easy_solved, medium_solved, hard_solved] : [school_solved, basic_solved, easy_solved, medium_solved, hard_solved],
             backgroundColor: [
-              'rgba(75, 192, 192, 0.5)',
-              'rgba(153, 102, 255, 0.5)',
-              'rgba(255, 99, 132, 0.5)'
+              platform.name === "leetcode" ? '#4CAF50' : '#90EE90', // School - Light green
+              platform.name === "leetcode" ? '#FFA500' : '#FFA500', // Basic - Yellow ochre
+              platform.name === "leetcode" ? '#4BC0C0' : '#FF6384', // Easy - Red
+              '#36A2EB', // Medium - Purple
+              platform.name === "leetcode" ? '#FF6384' : '#4CAF50' // Hard - Green
             ],
-            borderColor: [
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 99, 132, 1)'
-            ],
-            borderWidth: 1
+            borderColor: '#FFFFFF',
+            borderWidth: 2
           }
         ]
       };
@@ -175,7 +175,10 @@ function Dashboard() {
         responsive: true,
         plugins: {
           legend: {
-            position: 'top' as const,
+            position: 'bottom' as const,
+            labels: {
+              padding: 10
+            }
           },
           tooltip: {
             callbacks: {
@@ -184,22 +187,55 @@ function Dashboard() {
                 if (label) {
                   label += ': ';
                 }
-                if (context.parsed.y !== null) {
-                  label += context.parsed.y;
+                if (context.raw !== undefined) {
+                  label += context.raw;
                 }
                 return label;
               }
             }
+          }
+        },
+        layout: {
+          padding: {
+            bottom: 20
           }
         }
       };
 
       pieChart = (
         <Box sx={{ mt: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Difficulty Distribution
-          </Typography>
-          <Pie data={data} options={options} />
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            width: '90%',
+            maxWidth: '500px',
+            height: '90%',
+            margin: 'auto', 
+            textAlign: 'center' 
+          }}>
+            <Typography variant="h6" gutterBottom>
+              Difficulty Distribution
+            </Typography>
+            <Pie data={data} options={options} />
+            <div style={{ marginTop: '10px', display: 'flex', gap: '15px' }}>
+             
+            <Button 
+              variant="contained" 
+              color="primary" 
+              href={platform.stats.profile_url} 
+              target="_blank" 
+              sx={{
+                marginTop: '15px',
+                padding: '10px 20px',
+                borderRadius: '5px'
+              }}
+              >
+              View Profile on {platform.name}
+            </Button>
+          </div>
+              </div>
         </Box>
       );
     }
@@ -210,7 +246,7 @@ function Dashboard() {
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
               <Typography variant="h6" gutterBottom>Statistics</Typography>
-              <Typography variant="h3" color="primary" gutterBottom>
+              <Typography variant="h3" color="#FFD740" gutterBottom>
                 {platform.name === "hackerrank" ? platform.stats.badges?.length :
                  platform.name === "gfg" ? platform.stats.total_solved :
                  platform.name === "codechef" ? platform.stats.rating :
@@ -227,7 +263,7 @@ function Dashboard() {
             </Paper>
           </Grid>
           <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
+            <Paper sx={{ p: 3, bgcolor: 'background.paper', width: '100%' }}>
               <Typography variant="h6" gutterBottom>Platform Specific Stats</Typography>
               <Grid container spacing={2}>
                 {platform.name === "hackerrank" ? (
@@ -241,17 +277,18 @@ function Dashboard() {
                   </>
                 ) : platform.name === "gfg" ? (
                   <>
-                    <Grid item xs={3}><Typography variant="h6" color="success.main">{platform.stats.school_solved}</Typography><Typography variant="body2" color="text.secondary">School</Typography></Grid>
-                    <Grid item xs={3}><Typography variant="h6" color="warning.main">{platform.stats.basic_solved}</Typography><Typography variant="body2" color="text.secondary">Basic</Typography></Grid>
-                    <Grid item xs={3}><Typography variant="h6" color="error.main">{platform.stats.easy_solved}</Typography><Typography variant="body2" color="text.secondary">Easy</Typography></Grid>
-                    <Grid item xs={3}><Typography variant="h6" color="primary.main">{platform.stats.medium_solved}</Typography><Typography variant="body2" color="text.secondary">Medium</Typography></Grid>
-                    <Grid item xs={3}><Typography variant="h6" color="secondary.main">{platform.stats.hard_solved}</Typography><Typography variant="body2" color="text.secondary">Hard</Typography></Grid>
+                    <Grid item xs={2.4}><Typography variant="h6" color="success.main">{platform.stats.school_solved}</Typography><Typography variant="body2" color="text.secondary">School</Typography></Grid>
+                    <Grid item xs={2.4}><Typography variant="h6" color="warning.main">{platform.stats.basic_solved}</Typography><Typography variant="body2" color="text.secondary">Basic</Typography></Grid>
+                    <Grid item xs={2.4}><Typography variant="h6" color="error.main">{platform.stats.easy_solved}</Typography><Typography variant="body2" color="text.secondary">Easy</Typography></Grid>
+                    <Grid item xs={2.4}><Typography variant="h6" color="primary.main">{platform.stats.medium_solved}</Typography><Typography variant="body2" color="text.secondary">Medium</Typography></Grid>
+                    <Grid item xs={2.4}><Typography variant="h6" color="secondary.main">{platform.stats.hard_solved}</Typography><Typography variant="body2" color="text.secondary">Hard</Typography></Grid>
                   </>
                 ) : platform.name === "codechef" ? (
                   <>
                     <Grid item xs={4}><Typography variant="h6" color="success.main">{platform.stats.rating}</Typography><Typography variant="body2" color="text.secondary">Rating</Typography></Grid>
                     <Grid item xs={4}><Typography variant="h6" color="warning.main">{platform.stats.rank}</Typography><Typography variant="body2" color="text.secondary">Rank</Typography></Grid>
                     <Grid item xs={4}><Typography variant="h6" color="error.main">{platform.stats.total_solved}</Typography><Typography variant="body2" color="text.secondary">Total Solved</Typography></Grid>
+                    
                   </>
                 ) : platform.name === "codeforces" ? (
                   <>
@@ -272,7 +309,9 @@ function Dashboard() {
           </Grid>
         </Grid>
         <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
-          <Typography variant="h6" gutterBottom>Detailed Statistics</Typography>
+          {platform.name !== "leetcode" && platform.name !== "gfg" && (
+            <Typography variant="h6" gutterBottom>Detailed Statistics</Typography>
+          )}
           {platform.name === "hackerrank" ? (
             <>
               <Typography variant="body1">Total Badges: {platform.stats.badges?.length}</Typography>
@@ -287,21 +326,18 @@ function Dashboard() {
                   </Typography>
                 </>
               ))}
-            </>
-          ) : platform.name === "gfg" ? (
-            <>
-              <Typography variant="body1">Total Solved: {platform.stats.total_solved}</Typography>
-              <Typography variant="body1">School Problems: {platform.stats.school_solved}</Typography>
-              <Typography variant="body1">Basic Problems: {platform.stats.basic_solved}</Typography>
-              <Typography variant="body1">Easy Problems: {platform.stats.easy_solved}</Typography>
-              <Typography variant="body1">Medium Problems: {platform.stats.medium_solved}</Typography>
-              <Typography variant="body1">Hard Problems: {platform.stats.hard_solved}</Typography>
-            </>
-          ) : platform.name === "codechef" ? (
-            <>
-              <Typography variant="body1">Rating: {platform.stats.rating}</Typography>
-              <Typography variant="body1">Rank: #{platform.stats.rank}</Typography>
-              <Typography variant="body1">Total Solved: {platform.stats.total_solved}</Typography>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                href={platform.stats.profile_url} 
+                target="_blank" 
+                sx={{
+                  mt: 2,
+                  width: '100%'
+                }}
+              >
+                View Profile on {platform.name}
+              </Button>
             </>
           ) : platform.name === "codeforces" ? (
             <>
@@ -311,16 +347,38 @@ function Dashboard() {
               <Typography variant="body1">Max Rank: {platform.stats.max_rank}</Typography>
               <Typography variant="body1">Total Solved: {platform.stats.total_solved}</Typography>
               <Typography variant="body1">Contests: {platform.stats.contest_count}</Typography>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                href={platform.stats.profile_url} 
+                target="_blank" 
+                sx={{
+                  mt: 2,
+                  width: '100%'
+                }}
+              >
+                View Profile
+              </Button>
             </>
-          ) : (
+          ) : platform.name === "codechef" ? (
             <>
+              <Typography variant="body1">Rating: {platform.stats.rating}</Typography>
+              <Typography variant="body1">Rank: #{platform.stats.rank}</Typography>
               <Typography variant="body1">Total Solved: {platform.stats.total_solved}</Typography>
-              <Typography variant="body1">Easy Problems: {platform.stats.easy_solved}</Typography>
-              <Typography variant="body1">Medium Problems: {platform.stats.medium_solved}</Typography>
-              <Typography variant="body1">Hard Problems: {platform.stats.hard_solved}</Typography>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                href={platform.stats.profile_url} 
+                target="_blank" 
+                sx={{
+                  mt: 2,
+                  width: '100%'
+                }}
+              >
+                View Profile
+              </Button>
             </>
-          )}
-          <Button variant="outlined" color="primary" href={platform.stats.profile_url} target="_blank">View Profile on {platform.name.charAt(0).toUpperCase() + platform.name.slice(1)}</Button>
+          ) : null}
           {pieChart}
         </Paper>
       </Box>
