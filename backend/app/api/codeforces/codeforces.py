@@ -25,6 +25,7 @@ class CodeforcesStats(BaseModel):
     friend_count: int
     avatar: str
     profile_url: str
+    total_solved: int
 
 @router.post("/codeforces/stats", response_model=CodeforcesStats)
 async def get_codeforces_stats(user: CodeforcesUser):
@@ -40,16 +41,28 @@ async def get_codeforces_stats(user: CodeforcesUser):
         if data["status"] == "OK":
             user_info = data["result"][0]
             
+            # Fetch total solved count from submissions
+            submissions_url = f"{BASE_URL}user.status?handle={username}&from=1&count=10000"
+            submissions_response = requests.get(submissions_url)
+            submissions_data = submissions_response.json()
+            
+            total_solved = 0
+            if submissions_data["status"] == "OK":
+                total_solved = len({submission["problem"]["contestId"] * 1000 + submission["problem"]["index"] 
+                                for submission in submissions_data["result"] 
+                                if submission["verdict"] == "OK"})
+            
             return CodeforcesStats(
                 username=user_info["handle"],
-                rating=str(user_info.get("rating", "N/A")),
-                max_rating=str(user_info.get("maxRating", "N/A")),
+                rating=str(user_info.get("rating", "0")),
+                max_rating=str(user_info.get("maxRating", "0")),
                 rank=user_info.get("rank", "N/A"),
                 max_rank=user_info.get("maxRank", "N/A"),
                 contribution=user_info.get("contribution", 0),
                 friend_count=user_info.get("friendOfCount", 0),
                 avatar=user_info.get("avatar", ""),
-                profile_url=f"https://codeforces.com/profile/{username}"
+                profile_url=f"https://codeforces.com/profile/{username}",
+                total_solved=total_solved
             )
         else:
             logger.error(f"User not found: {username}")

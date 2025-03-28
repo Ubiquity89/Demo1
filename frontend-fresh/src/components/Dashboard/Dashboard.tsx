@@ -270,7 +270,7 @@ function Dashboard() {
                   <>
                     {platform.stats.badges?.map((badge, index) => (
                       <Grid item xs={4} key={index}>
-                        <Typography variant="h6" color="primary.main">{badge.stars}</Typography>
+                        <Typography variant="h6" color="#4CAF50">{badge.stars}</Typography>
                         <Typography variant="body2" color="text.secondary">{badge.title}</Typography>
                       </Grid>
                     ))}
@@ -286,15 +286,13 @@ function Dashboard() {
                 ) : platform.name === "codechef" ? (
                   <>
                     <Grid item xs={4}><Typography variant="h6" color="success.main">{platform.stats.rating}</Typography><Typography variant="body2" color="text.secondary">Rating</Typography></Grid>
-                    <Grid item xs={4}><Typography variant="h6" color="warning.main">{platform.stats.rank}</Typography><Typography variant="body2" color="text.secondary">Rank</Typography></Grid>
                     <Grid item xs={4}><Typography variant="h6" color="error.main">{platform.stats.total_solved}</Typography><Typography variant="body2" color="text.secondary">Total Solved</Typography></Grid>
-                    
                   </>
                 ) : platform.name === "codeforces" ? (
                   <>
-                    <Grid item xs={4}><Typography variant="h6" color="success.main">{platform.stats.rating}</Typography><Typography variant="body2" color="text.secondary">Rating</Typography></Grid>
-                    <Grid item xs={4}><Typography variant="h6" color="warning.main">{platform.stats.max_rating}</Typography><Typography variant="body2" color="text.secondary">Max Rating</Typography></Grid>
-                    <Grid item xs={4}><Typography variant="h6" color="error.main">{platform.stats.contest_count}</Typography><Typography variant="body2" color="text.secondary">Contests</Typography></Grid>
+                    <Grid item xs={4}><Typography variant="h6" color="success.main">{platform.stats.rating || 0}</Typography><Typography variant="body2" color="text.secondary">Rating</Typography></Grid>
+                    <Grid item xs={4}><Typography variant="h6" color="warning.main">{platform.stats.max_rating || 0}</Typography><Typography variant="body2" color="text.secondary">Max Rating</Typography></Grid>
+                    <Grid item xs={4}><Typography variant="h6" color="error.main">{platform.stats.total_solved}</Typography><Typography variant="body2" color="text.secondary">Total Solved</Typography></Grid>
                   </>
                 ) : (
                   <>
@@ -341,11 +339,11 @@ function Dashboard() {
             </>
           ) : platform.name === "codeforces" ? (
             <>
-              <Typography variant="body1">Rating: {platform.stats.rating}</Typography>
-              <Typography variant="body1">Max Rating: {platform.stats.max_rating}</Typography>
+              <Typography variant="body1">Rating: {platform.stats.rating || 0}</Typography>
+              <Typography variant="body1">Max Rating: {platform.stats.max_rating || 0}</Typography>
               <Typography variant="body1">Rank: {platform.stats.rank}</Typography>
               <Typography variant="body1">Max Rank: {platform.stats.max_rank}</Typography>
-              <Typography variant="body1">Total Solved: {platform.stats.total_solved}</Typography>
+              <Typography variant="body1">Total Solved: {platform.stats.total_solved || 'N/A'}</Typography>
               <Typography variant="body1">Contests: {platform.stats.contest_count}</Typography>
               <Button 
                 variant="contained" 
@@ -357,13 +355,12 @@ function Dashboard() {
                   width: '100%'
                 }}
               >
-                View Profile
+                View Profile on {platform.name}
               </Button>
             </>
           ) : platform.name === "codechef" ? (
             <>
               <Typography variant="body1">Rating: {platform.stats.rating}</Typography>
-              <Typography variant="body1">Rank: #{platform.stats.rank}</Typography>
               <Typography variant="body1">Total Solved: {platform.stats.total_solved}</Typography>
               <Button 
                 variant="contained" 
@@ -375,7 +372,7 @@ function Dashboard() {
                   width: '100%'
                 }}
               >
-                View Profile
+                View Profile on {platform.name}
               </Button>
             </>
           ) : null}
@@ -386,6 +383,8 @@ function Dashboard() {
   };
 
   const selectedPlatformData = platforms.find(p => p.name === selectedPlatform);
+
+  // ... rest of the code ...
 
   return (
     <Container maxWidth="lg">
@@ -410,5 +409,6 @@ function Dashboard() {
     </Container>
   );
 }
+
 
 export default Dashboard;
