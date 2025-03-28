@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5175"],
+    origin: ["http://localhost:5173", "http://localhost:5175", "http://localhost:5177"],
     credentials: true
 }));
 app.use(express.json());
@@ -45,5 +45,5 @@ const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log('Environment:', process.env.NODE_ENV);
-  console.log('CORS origin:', ["http://localhost:5173", "http://localhost:5175"]);
+  console.log('CORS origin:', ["http://localhost:5173", "http://localhost:5175", "http://localhost:5177"]);
 });
