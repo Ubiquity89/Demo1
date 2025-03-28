@@ -13,6 +13,10 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface Badge {
   title: string;
@@ -143,6 +147,63 @@ function Dashboard() {
   const getPlatformStats = (platform: PlatformData) => {
     if (!platform.stats) return null;
 
+    const { total_solved, easy_solved, medium_solved, hard_solved, profile_url } = platform.stats;
+
+    let pieChart = null;
+    if (platform.name === "leetcode" || platform.name === "gfg") {
+      const data = {
+        labels: ['Easy', 'Medium', 'Hard'],
+        datasets: [
+          {
+            data: [easy_solved, medium_solved, hard_solved],
+            backgroundColor: [
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(153, 102, 255, 0.5)',
+              'rgba(255, 99, 132, 0.5)'
+            ],
+            borderColor: [
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+          }
+        ]
+      };
+
+      const options = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top' as const,
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let label = context.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  label += context.parsed.y;
+                }
+                return label;
+              }
+            }
+          }
+        }
+      };
+
+      pieChart = (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Difficulty Distribution
+          </Typography>
+          <Pie data={data} options={options} />
+        </Box>
+      );
+    }
+
     return (
       <Box>
         <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -260,6 +321,7 @@ function Dashboard() {
             </>
           )}
           <Button variant="outlined" color="primary" href={platform.stats.profile_url} target="_blank">View Profile on {platform.name.charAt(0).toUpperCase() + platform.name.slice(1)}</Button>
+          {pieChart}
         </Paper>
       </Box>
     );
