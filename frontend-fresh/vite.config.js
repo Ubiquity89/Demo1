@@ -14,7 +14,7 @@ export default {
   server: {
     proxy: {
       '/api': {
-        target: 'https://codetracker-cxnp.onrender.com',
+        target: 'https://codetrackerr-glmq.onrender.com',
         changeOrigin: true,
         secure: false,
       },
