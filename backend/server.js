@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ["https://codetracker-frontend.onrender.com/"],
+    origin: ["https://codetrackerr-glmq.onrender.com/"],
     credentials: true
 }));
 app.use(express.json());
